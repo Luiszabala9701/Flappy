@@ -5,7 +5,6 @@ import sys
 # Inicializar Pygame
 pygame.init()
 
-#prueba push g
 
 # Inicializar el mezclador de sonido
 pygame.mixer.init()
