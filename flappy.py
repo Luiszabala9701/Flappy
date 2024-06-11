@@ -3,7 +3,7 @@ import random
 import sys
 
 #prueba github
-#prueba rama luis
+#prueba rama luis 2
 # Inicializar Pygame
 pygame.init()
 
