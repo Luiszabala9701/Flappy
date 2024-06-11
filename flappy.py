@@ -175,10 +175,10 @@ def main():
                 nuevas_tuberias.append(tuberia)
                 # Verificar si el pájaro pasa entre las tuberías y aumentar el puntaje
                 if tuberia.x + ancho_tuberia < pajaro.x <= tuberia.x + ancho_tuberia + velocidad_tuberia:
+                    if puntaje > 0:
+                        sonido_punto.play()
                     if tuberia.y == 0:  # Solo contar la tubería superior para el puntaje
                         puntaje += 1
-                        print(f"Pasaste una tubería, puntaje: {puntaje}")
-                        sonido_punto.play()
             else:
                 # Cuando la tubería sale de la pantalla, eliminarla de la lista
                 del tuberia
