@@ -20,11 +20,11 @@ salto = -6
 color_fondo = (135, 206, 250)
 color_pajaro = (255, 0, 100)
 color_tuberia = (0, 128, 0)
-imagen_pajaro = pygame.image.load(r"C:\Users\agus\Documents\python1\final\src\flappy.png")
+imagen_pajaro = pygame.image.load(r"src\flappy.png")
 imagen_pajaro = pygame.transform.scale(imagen_pajaro, (60, 40))
-imagen_fondo = pygame.image.load("C:/Users/agus/Documents/python1/final/src/cielo.jpg")
+imagen_fondo = pygame.image.load("src/cielo.jpg")
 imagen_fondo = pygame.transform.scale(imagen_fondo, (ANCHO, ALTURA))
-sonido_punto = pygame.mixer.Sound('C:/Users/agus/Documents/python1/final/src/pajaro_sonido2.wav')
+sonido_punto = pygame.mixer.Sound('src/pajaro_sonido2.wav')
 sonido_punto.set_volume(0.03)
 # Variables globales para el puntaje y la velocidad de las tuberías
 puntaje = 0
