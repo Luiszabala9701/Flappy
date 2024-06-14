@@ -101,6 +101,9 @@ def mostrarMenuPausa(pantalla, pausa):
                 elif evento.key == pygame.K_s:
                     pygame.quit()
                     sys.exit()
+        # Evitar que las tuberías se muevan mientras el juego está en pausa
+        pygame.time.delay(10)
+        pygame.event.pump()  # Procesar eventos para evitar bloqueo
 
 
 # Función principal del juego
