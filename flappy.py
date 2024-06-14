@@ -78,7 +78,6 @@ def mostrarMenuReinicio(pantalla, puntaje):
                 elif evento.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-
 # Función para mostrar el menú de pausa
 def mostrarMenuPausa(pantalla, pausa):
     font = pygame.font.Font(None, 36)
@@ -97,10 +96,11 @@ def mostrarMenuPausa(pantalla, pausa):
                 sys.exit()
             if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_p:
-                    return False  # Continuar o pausar el juego
+                    return not pausa  # Cambiar el estado de pausa
                 elif evento.key == pygame.K_s:
                     pygame.quit()
                     sys.exit()
+
         # Evitar que las tuberías se muevan mientras el juego está en pausa
         pygame.time.delay(10)
         pygame.event.pump()  # Procesar eventos para evitar bloqueo
@@ -108,11 +108,12 @@ def mostrarMenuPausa(pantalla, pausa):
 
 # Función principal del juego
 def main():
-    global puntaje, velocidad_tuberia, espacio_tuberia, FPS  # Asegurarse de que FPS sea global
+    global puntaje, velocidad_tuberia, espacio_tuberia, FPS, juego_en_pausa  # Asegurarse de que FPS y juego_en_pausa sean globales
 
     puntaje = 0
     espacio_tuberia = 150
     velocidad_tuberia = 3  # Velocidad inicial de las tuberías
+    juego_en_pausa = False  # Variable para controlar el estado de pausa del juego
 
     pantalla = pygame.display.set_mode((ANCHO, ALTURA), pygame.FULLSCREEN)
     tiempo = pygame.time.Clock()
@@ -141,52 +142,55 @@ def main():
                 if evento.key == pygame.K_SPACE:
                     movimiento_pajaro = salto
                 elif evento.key == pygame.K_p:
-                    if mostrarMenuPausa(pantalla, True):
-                        return main()  # Reiniciar el juego si se selecciona salir desde el menú de pausa
+                    juego_en_pausa = not juego_en_pausa
+                    if juego_en_pausa:
+                        if mostrarMenuPausa(pantalla, True):
+                            return main()  # Reiniciar el juego si se selecciona salir desde el menú de pausa
 
-        # Movimiento del pájaro
-        movimiento_pajaro += gravedad
-        pajaro.y += movimiento_pajaro
+        if not juego_en_pausa:  # Solo genera nuevas tuberías si el juego no está en pausa
+            # Movimiento del pájaro
+            movimiento_pajaro += gravedad
+            pajaro.y += movimiento_pajaro
 
-        # Verificar si el pájaro ha muerto
-        if pajaro.top <= 0 or pajaro.bottom >= ALTURA:
-            if mostrarMenuReinicio(pantalla, puntaje):
-                return main()
+            # Verificar si el pájaro ha muerto
+            if pajaro.top <= 0 or pajaro.bottom >= ALTURA:
+                if mostrarMenuReinicio(pantalla, puntaje):
+                    return main()
 
-        # Generar tuberías cercanas al pájaro
-        contador_tuberia += tiempo.get_time()
-        if contador_tuberia > frecuencia_tuberia:
-            tuberia_superior, tuberia_inferior = crearTuberiaCercana(pajaro.y)
-            tuberias.append(tuberia_superior)
-            tuberias.append(tuberia_inferior)
-            contador_tuberia = 0
+            # Generar tuberías cercanas al pájaro
+            contador_tuberia += tiempo.get_time()
+            if contador_tuberia > frecuencia_tuberia:
+                tuberia_superior, tuberia_inferior = crearTuberiaCercana(pajaro.y)
+                tuberias.append(tuberia_superior)
+                tuberias.append(tuberia_inferior)
+                contador_tuberia = 0
 
-        # Aumentar la velocidad del juego y el espacio de las tuberías cada 7 puntos
-        if int(puntaje) % 7 == 0 and int(puntaje) != 0:
-            if not incremento_aplicado:
-                if velocidad_tuberia <= 10:
-                    velocidad_tuberia += 1
-                espacio_tuberia -= 5  # Reducir el espacio entre tuberías
-                incremento_aplicado = True
-        else:
-            incremento_aplicado = False
-
-        # Mover tuberías
-        nuevas_tuberias = []
-        for tuberia in tuberias:
-            tuberia.x -= velocidad_tuberia
-            if tuberia.x + ancho_tuberia > 0:
-                nuevas_tuberias.append(tuberia)
-                # Verificar si el pájaro pasa entre las tuberías y aumentar el puntaje
-                if tuberia.x + ancho_tuberia < pajaro.x <= tuberia.x + ancho_tuberia + velocidad_tuberia:
-                    if puntaje > 0:
-                        sonido_punto.play()
-                    if tuberia.y == 0:  # Solo contar la tubería superior para el puntaje
-                        puntaje += 1
+            # Aumentar la velocidad del juego y el espacio de las tuberías cada 7 puntos
+            if int(puntaje) % 7 == 0 and int(puntaje) != 0:
+                if not incremento_aplicado:
+                    if velocidad_tuberia <= 10:
+                        velocidad_tuberia += 1
+                    espacio_tuberia -= 5  # Reducir el espacio entre tuberías
+                    incremento_aplicado = True
             else:
-                # Cuando la tubería sale de la pantalla, eliminarla de la lista
-                del tuberia
-        tuberias = nuevas_tuberias
+                incremento_aplicado = False
+
+            # Mover tuberías
+            nuevas_tuberias = []
+            for tuberia in tuberias:
+                tuberia.x -= velocidad_tuberia
+                if tuberia.x + ancho_tuberia > 0:
+                    nuevas_tuberias.append(tuberia)
+                    # Verificar si el pájaro pasa entre las tuberías y aumentar el puntaje
+                    if tuberia.x + ancho_tuberia < pajaro.x <= tuberia.x + ancho_tuberia + velocidad_tuberia:
+                        if puntaje > 0:
+                            sonido_punto.play()
+                        if tuberia.y == 0:  # Solo contar la tubería superior para el puntaje
+                            puntaje += 1
+                else:
+                    # Cuando la tubería sale de la pantalla, eliminarla de la lista
+                    del tuberia
+            tuberias = nuevas_tuberias
 
         # Dibujar elementos
         pantalla.blit(imagen_fondo, (0, 0))  
